@@ -16,6 +16,8 @@ services:
       - HOST_PROJECT_PATH=${HOST_PROJECT_PATH}
       - SANDBOX_IMAGE=${SANDBOX_IMAGE:-sandbox}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - REACT_PROJECT_COMMAND=${REACT_PROJECT_COMMAND:-npx --yes create-vite@latest sandbox --template react}
+
     networks:
       - sandbox-network
     restart: always

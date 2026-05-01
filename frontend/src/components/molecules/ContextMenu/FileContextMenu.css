@@ -1,21 +1,70 @@
+.fileContextOptionsWrapper {
+    min-width: 160px;
+    position: fixed;
+    background-color: #1e1f2e;
+    border: 1px solid #44475a;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    padding: 4px 0;
+    overflow: hidden;
+}
+
 .fileContextButton {
-    color: white;
+    color: #e0e0e0;
     border: none;
     outline: none;
     width: 100%;
-    height: 30px;
+    height: 32px;
     cursor: pointer;
-    background-color: #363545;
-    padding: 5px;
+    background-color: transparent;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.15s ease;
 }
 
 .fileContextButton:hover {
-    background-color: #4d4b4b;
+    background-color: #44475a;
 }
 
-.fileContextOptionsWrapper {
-    width: 120px;
-    position: fixed;
-    border: 1.5px solid black;
+.fileContextButtonDanger:hover {
+    background-color: #ff5555;
+    color: white;
+}
 
+.fileContextDivider {
+    height: 1px;
+    background-color: #44475a;
+    margin: 4px 0;
+}
+
+.fileContextInputWrapper {
+    padding: 6px 8px;
+}
+
+.fileContextInput {
+    width: 100%;
+    padding: 6px 8px;
+    background-color: #282a36;
+    border: 1px solid #6272a4;
+    border-radius: 4px;
+    color: #f8f8f2;
+    font-size: 13px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.fileContextInput:focus {
+    border-color: #bd93f9;
+    box-shadow: 0 0 0 2px rgba(189, 147, 249, 0.2);
+}
+
+.fileContextInput::placeholder {
+    color: #6272a4;
 }

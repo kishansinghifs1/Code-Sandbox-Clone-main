@@ -10,12 +10,7 @@ export const TreeNode = ({ fileFolderData }) => {
   const [visibility, setVisibility] = useState({});
   const { editorSocket } = useEditorSocketStore();
 
-  const {
-    setFile,
-    setIsOpen: setFileContextMenuIsOpen,
-    setX: setFileContextMenuX,
-    setY: setFileContextMenuY,
-  } = useFileContextMenuStore();
+  const { openMenu } = useFileContextMenuStore();
 
   function toggleVisibility(name) {
     setVisibility({
@@ -34,13 +29,17 @@ export const TreeNode = ({ fileFolderData }) => {
       pathToFileOrFolder: fileFolderData.path,
     });
   }
-  function handleContextMenuForFiles(e, path) {
+
+  function handleContextMenu(e, path, isFolder) {
     e.preventDefault();
-    console.log("Right clicked on", path, e);
-    setFile(path);
-    setFileContextMenuX(e.clientX);
-    setFileContextMenuY(e.clientY);
-    setFileContextMenuIsOpen(true);
+    e.stopPropagation();
+    console.log("Right clicked on", path, "isFolder:", isFolder);
+    openMenu({
+      x: e.clientX,
+      y: e.clientY,
+      path,
+      isFolder
+    });
   }
 
   useEffect(() => {
@@ -59,6 +58,9 @@ export const TreeNode = ({ fileFolderData }) => {
           /** If the current node is a folder, render it as a button */
           <button
             onClick={() => toggleVisibility(fileFolderData.name)}
+            onContextMenu={(e) =>
+              handleContextMenu(e, fileFolderData.path, true)
+            }
             style={styles.folderButton}
           >
             {visibility[fileFolderData.name] ? (
@@ -90,7 +92,7 @@ export const TreeNode = ({ fileFolderData }) => {
                 // color: "black"
               }}
               onContextMenu={(e) =>
-                handleContextMenuForFiles(e, fileFolderData.path)
+                handleContextMenu(e, fileFolderData.path, false)
               }
               onDoubleClick={() => handleDoubleClick(fileFolderData)}
             >

@@ -10,6 +10,7 @@ export const TreeStructure = () => {
     const { 
         file,
         isOpen: isFileContextOpen, 
+        isFolder,
         x: fileContextX, 
         y: fileContextY } = useFileContextMenuStore();
 
@@ -28,6 +29,7 @@ export const TreeStructure = () => {
                 x={fileContextX}
                 y={fileContextY}
                 path={file}
+                isFolder={isFolder}
             />
         )}
             <TreeNode

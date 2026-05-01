@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import path from "path";
 import { getContainerPort } from "../containers/handleContainerCreate.js";
 
 export const handleEditorSocketEvents = (socket,editorNamespace) => {
@@ -18,16 +19,24 @@ export const handleEditorSocketEvents = (socket,editorNamespace) => {
     });
 
     socket.on("createFile", async ({ pathToFileOrFolder }) => {
-        const isFileAlreadyPresent = await fs.stat(pathToFileOrFolder);
-        if(isFileAlreadyPresent) {
-            socket.emit("error", {
-                data: "File already exists",
-            });
-            return;
-        }
-
         try {
-            const response = await fs.writeFile(pathToFileOrFolder, "");
+            // Check if the file already exists
+            try {
+                await fs.stat(pathToFileOrFolder);
+                // If stat succeeds, file exists
+                socket.emit("error", {
+                    data: "File already exists",
+                });
+                return;
+            } catch (e) {
+                // File doesn't exist, which is expected — continue creating it
+            }
+
+            // Ensure parent directory exists
+            const parentDir = path.dirname(pathToFileOrFolder);
+            await fs.mkdir(parentDir, { recursive: true });
+
+            await fs.writeFile(pathToFileOrFolder, "");
             socket.emit("createFileSuccess", {
                 data: "File created successfully",
             });
@@ -58,7 +67,7 @@ export const handleEditorSocketEvents = (socket,editorNamespace) => {
 
     socket.on("deleteFile", async ({ pathToFileOrFolder }) => {
         try {
-            const response = await fs.unlink(pathToFileOrFolder);
+            await fs.unlink(pathToFileOrFolder);
             socket.emit("deleteFileSuccess", {
                 data: "File deleted successfully",
             });
@@ -72,7 +81,8 @@ export const handleEditorSocketEvents = (socket,editorNamespace) => {
 
     socket.on("createFolder", async ({ pathToFileOrFolder}) => {
         try {
-            const response = await fs.mkdir(pathToFileOrFolder);
+            // Use recursive: true so nested folders can be created
+            await fs.mkdir(pathToFileOrFolder, { recursive: true });
             socket.emit("createFolderSuccess", {
                 data: "Folder created successfully",
             });
@@ -86,7 +96,8 @@ export const handleEditorSocketEvents = (socket,editorNamespace) => {
 
     socket.on("deleteFolder", async ({ pathToFileOrFolder }) => {
         try {
-            const response = await fs.rmdir(pathToFileOrFolder, { recursive: true });
+            // Use fs.rm with recursive instead of deprecated fs.rmdir
+            await fs.rm(pathToFileOrFolder, { recursive: true, force: true });
             socket.emit("deleteFolderSuccess", {
                 data: "Folder deleted successfully",
             });
