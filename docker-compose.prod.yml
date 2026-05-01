@@ -1,0 +1,47 @@
+services:
+  backend:
+    image: ${BACKEND_IMAGE:-codesandbox-backend}
+    container_name: codesandbox-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    volumes:
+      - ./backend/projects:/app/projects
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PORT=3000
+      - HOST_PROJECT_PATH=${HOST_PROJECT_PATH}
+      - SANDBOX_IMAGE=${SANDBOX_IMAGE:-sandbox}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - sandbox-network
+    restart: always
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-codesandbox-frontend}
+    container_name: codesandbox-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - sandbox-network
+    restart: always
+
+  sandbox:
+    image: ${SANDBOX_IMAGE:-sandbox}
+    container_name: codesandbox-sandbox
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.sandbox
+    command: ["true"]
+
+networks:
+  sandbox-network:
+    driver: bridge

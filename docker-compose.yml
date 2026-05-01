@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./backend/projects:/app/projects
+    environment:
+      - PORT=3000
+      - HOST_PROJECT_PATH=${HOST_PROJECT_PATH:-$PWD/backend}
+      - SANDBOX_IMAGE=sandbox
+    networks:
+      - sandbox-network
+    depends_on:
+      - sandbox
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_TERMINAL_URL=ws://localhost:4000
+    depends_on:
+      - backend
+    networks:
+      - sandbox-network
+
+  sandbox:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.sandbox
+    image: sandbox
+    # This service doesn't need to run, just build the image
+    command: ["true"]
+
+networks:
+  sandbox-network:
+    driver: bridge

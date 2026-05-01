@@ -1,0 +1,6 @@
+node_modules
+.env
+Dockerfile
+Dockerfile.sandbox
+projects
+docker-compose.yml
